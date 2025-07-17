@@ -3,7 +3,7 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100vh;
-  overflow: hidden; /* 全体スクロールを防止 */
+  overflow-y: auto; /* 全体スクロールを許可 */
   font-family: 'Yu Gothic', 'MS Gothic', sans-serif;
   color: #372f1e;
   display: flex;
