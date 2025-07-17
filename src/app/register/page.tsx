@@ -159,7 +159,7 @@ export default function Register() {
                   } else {
                     alert('該当する住所が見つかりませんでした');
                   }
-                } catch (err) {
+                } catch {
                   alert('郵便番号検索に失敗しました');
                 }
               }
