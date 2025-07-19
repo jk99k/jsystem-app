@@ -223,6 +223,7 @@ export default function EntryPage() {
               )}
 
               <div className="flex gap-4">
+                {!isCustomerActive && (
                   <button
                     onClick={handleAttend}
                     disabled={actionLoading}
@@ -230,13 +231,16 @@ export default function EntryPage() {
                   >
                     入店処理
                   </button>
+                )}
+                {isCustomerActive && (
                   <button
                     onClick={handleCheckOut}
                     disabled={actionLoading}
-                    className="flex-1 bg-red-600 text-black px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     退店処理
                   </button>
+                )}
               </div>
             </div>
           </div>
