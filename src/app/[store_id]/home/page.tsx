@@ -24,6 +24,11 @@ type ShopData = {
 };
 
 export default function Home() {
+  // 店舗ID取得用（将来の拡張用）
+  // import { useParams } from "next/navigation";
+  // const params = useParams();
+  // const storeId = params?.store_id || "";
+
   return (
     <div className="min-h-screen flex flex-col font-sans text-[#372f1e] bg-[url('/img/wood_texture.jpg')] bg-no-repeat bg-cover bg-fixed bg-center relative overflow-hidden">
       <div className="fixed inset-0 bg-[rgba(40,30,15,0.2)] pointer-events-none -z-10"></div>

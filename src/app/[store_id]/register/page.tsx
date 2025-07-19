@@ -116,6 +116,11 @@ export default function Register() {
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
+  // 店舗ID取得用（将来の拡張用）
+  // import { useParams } from "next/navigation";
+  // const params = useParams();
+  // const storeId = params?.store_id || "";
+
   return (
     <div className="min-h-screen bg-[url('/img/background.png')] bg-cover bg-center bg-fixed relative">
       {/* 背景オーバーレイ */}
