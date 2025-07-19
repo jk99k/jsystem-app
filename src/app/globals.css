@@ -1,8 +1,1 @@
 @import "tailwindcss";
-
-/* カスタムフォントファミリーの定義 */
-@layer base {
-  html {
-    font-family: "Yu Gothic", "MS Gothic", sans-serif;
-  }
-}
