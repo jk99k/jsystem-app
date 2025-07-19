@@ -1,209 +1,233 @@
-// pages/index.tsx または pages/index.js
-import Image from "next/image";
+"use client";
 
-// JSONデータの型定義(任意)
-type FavoredCustomer = {
-  home_town: string;
-  nickname: string;
-  comment: string;
-  attendance: number;
-  tags: string[];
-};
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { getActiveCustomers, CustomerAttendance } from "@/services/api/customers";
 
-type Staff = {
-  origin: string;
-  name: string;
-  nickname: string;
-  comment: string;
-};
+const staffData = [
+  {
+    prefecture: "京都府",
+    name: "乾　祐樹",
+    nickname: "ぬい",
+    message: "店長です！",
+  },
+  {
+    prefecture: "京都府",
+    name: "荷掛　聖也",
+    nickname: "にか",
+    message: "最近入りました！",
+  },
+  {
+    prefecture: "京都府",
+    name: "馬場 喜滉",
+    nickname: "馬場ちゃん",
+    message: "ワインソムリエ目指してます！",
+  },
+];
 
-type ShopData = {
-  favoredCustomers: FavoredCustomer[];
-  staffs: Staff[];
-  shopComments: string[];
-};
+const currentDate = new Date();
+const formattedDate = `${currentDate.getMonth() + 1}月${currentDate.getDate()}日`;
 
 export default function Home() {
-  // 店舗ID取得用（将来の拡張用）
-  // import { useParams } from "next/navigation";
-  // const params = useParams();
-  // const storeId = params?.store_id || "";
+  const params = useParams();
+  const storeId = params.store_id as string;
+  const [activeCustomers, setActiveCustomers] = useState<CustomerAttendance[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // 出席中の顧客一覧を取得
+  useEffect(() => {
+    const fetchActiveCustomers = async () => {
+      try {
+        setLoading(true);
+        const customers = await getActiveCustomers(storeId);
+        setActiveCustomers(customers);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '出席中顧客の取得に失敗しました');
+        console.error('出席中顧客の取得エラー:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActiveCustomers();
+  }, [storeId]);
 
   return (
-    <div className="min-h-screen flex flex-col font-sans text-[#372f1e] bg-[url('/img/wood_texture.jpg')] bg-no-repeat bg-cover bg-fixed bg-center relative overflow-hidden">
-      <div className="fixed inset-0 bg-[rgba(40,30,15,0.2)] pointer-events-none -z-10"></div>
+    <div className="min-h-screen bg-[url('/img/background.png')] bg-cover bg-center bg-fixed relative font-serif">
+      {/* 背景オーバーレイ */}
+      <div className="fixed inset-0 bg-[rgba(40,30,15,0.15)] pointer-events-none -z-10" />
+      {/* メインコンテナ */}
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* ヘッダー */}
+        <Header formattedDate={formattedDate} />
 
-      {/* ヘッダー */}
-      <header className="px-4 py-2 bg-[rgba(50,38,18,0.85)] border-b-4 border-[#2b220f] shadow-[inset_0_-4px_8px_rgba(0,0,0,0.6)] shrink-0">
-        <div className="flex items-center gap-3">
-          <Image
-            src="/img/kotobuki_logo.jpg"
-            alt="百年蕎麦 壽 ロゴ"
-            width={64}
-            height={64}
-            className="rounded-full object-contain"
-          />
-          <h1 className="text-lg sm:text-2xl text-[#d4c8ad] tracking-[2px] font-serif drop-shadow-[2px_2px_4px_rgba(0,0,0,0.7)]">
-            百年蕎麦 壽　7月10日　ご贔屓さん出席状況
-          </h1>
-        </div>
-      </header>
+        {/* メインコンテンツ */}
+        <main className="flex-1 flex items-center justify-center p-4">
+          <div className="w-full max-w-5xl px-4 space-y-10">
+            {/* ご贔屓さん出席状況テーブル */}
+            <section className="bg-white/90 backdrop-blur-sm shadow-xl border border-[#162b42]/30 overflow-hidden">
+              <div className="bg-[#162b42] px-4 md:px-8 py-4">
+                <h2 className="text-lg md:text-xl font-bold text-amber-100 text-center tracking-wide">
+                  現在出席中のご贔屓さん
+                </h2>
+              </div>
 
-      {/* メイン */}
-      <main className="flex-1 overflow-y-auto px-4 py-3 text-[#3a2f1b]">
-        {/* ご贔屓さんテーブル */}
-        <div className="max-h-[70vh] overflow-x-auto mb-5 border-2 border-[#3f3520] bg-[rgba(255,255,240,0.6)] rounded">
-          <table className="w-full border-collapse bg-[rgba(255,255,240,0.4)] border-4 border-[#3f3520] text-sm sm:text-[1.05rem] font-mono tracking-wider">
-            <thead>
-              <tr className="bg-[rgba(220,200,160,0.7)] text-[#2a2108] font-bold uppercase tracking-wide">
-                <th className="px-2 py-1 sm:px-4 sm:py-2 border-4 border-[#3f3520]">出身地</th>
-                <th className="px-2 py-1 sm:px-4 sm:py-2 border-4 border-[#3f3520]">
-                  <div className="flex flex-wrap sm:flex-nowrap justify-center items-center gap-1 text-center w-full">
-                    <span>ニックネーム</span>
-                    <span className="bg-yellow-200 text-yellow-900 text-[0.6rem] px-1.5 py-0.5 rounded-full shadow-inner whitespace-nowrap">
-                      楽しみ方
-                    </span>
-                  </div>
-                </th>
-                <th className="px-2 py-1 sm:px-4 sm:py-2 border-4 border-[#3f3520]">一言</th>
-                {/* 幅のレスポンシブ対応 */}
-                <th className="border-4 border-[#3f3520] px-1 py-1 sm:px-3 sm:py-2 
-                   sm:w-auto  text-center">
-                  出席回数
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...Array(10)].map((_, i) => (
-                <tr
-                  key={i}
-                  className={`${i % 2 === 1 ? 'bg-[rgba(255,255,240,0.5)]' : ''} hover:bg-[rgba(255,255,200,0.2)]`}
-                >
-                  {["京都府", "荷掛テスト", "海に行きたい", "5"].map((text, j) => {
-                    if (j === 1) {
-                      // ニックネーム（左寄せ）
-                      return (
-                        <td
-                          key={j}
-                          className="px-2 py-1 sm:px-4 sm:py-2 border-4 border-[#3f3520] text-left bg-[rgba(255,255,240,0.65)] font-semibold text-[#1e1406]"
-                        >
-                          <div className="flex flex-wrap sm:flex-nowrap justify-start items-center gap-1 w-full text-left">
-                            <span>{text}</span>
-                            {["一人飲み", "飲み友探し", "スタッフと会話"].map((tag, idx) => {
-                              const tagColor = {
-                                "一人飲み": "bg-red-200 text-red-900",
-                                "飲み友探し": "bg-blue-200 text-blue-900",
-                                "スタッフと会話": "bg-green-200 text-green-900",
-                              }[tag] || "bg-gray-200 text-gray-800";
-                              return (
-                                <span
-                                  key={idx}
-                                  className={`${tagColor} text-xs px-1.5 py-0.5 rounded-full shadow-inner whitespace-nowrap`}
-                                >
-                                  {tag}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </td>
-                      );
-                    }
-                    if (j === 2) {
-                      // 一言（左寄せ）
-                      return (
-                        <td
-                          key={j}
-                          className="px-2 py-1 sm:px-4 sm:py-2 border-4 border-[#3f3520] text-left bg-[rgba(255,255,240,0.65)] font-semibold text-[#1e1406]"
-                        >
-                          {text}
-                        </td>
-                      );
-                    }
-                    return (
-                      <td
-                        key={j}
-                        className={`${
-                          j === 3
-                            ? 'w-[28px] min-w-[28px] sm:w-auto sm:min-w-[64px] px-1 sm:px-3'
-                            : 'px-2 sm:px-4'
-                        } py-1 sm:py-2 border-4 border-[#3f3520] text-center bg-[rgba(255,255,240,0.65)] font-semibold text-[#1e1406]`}
-                      >
-                        {text}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </main>
-
-      {/* 出勤スタッフと一言 */}
-      <section className="flex flex-col sm:flex-row gap-4 p-4 bg-[rgba(255,255,255,0.4)] text-sm text-[#333] border-t border-[#ccc]">
-        {/* 出勤スタッフ */}
-        <div className="flex-1 w-full sm:w-auto">
-          <h2 className="text-base mb-2 text-[#2d1d0f] border-l-4 border-[#8b5c2c] pl-2">
-            本日の出勤スタッフ
-          </h2>
-          <div className="overflow-x-auto border border-[#3f3520] bg-[rgba(255,255,240,0.6)] rounded">
-            <table className="w-full border-collapse text-sm sm:text-[1.05rem] font-mono tracking-wider border border-[#3f3520]">
-              <thead>
-                <tr className="bg-[rgba(220,200,160,0.7)] text-[#2a2108] font-bold uppercase tracking-wider">
-                  <th className="px-2 py-1 border border-[#3f3520]">出身地</th>
-                  <th className="px-2 py-1 border border-[#3f3520]">スタッフ名</th>
-                  <th className="px-2 py-1 border border-[#3f3520] text-left">ニックネーム</th>
-                  <th className="px-2 py-1 border border-[#3f3520] text-left">一言</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  ["京都府", "乾 祐樹", "ぬい", "店長です！"],
-                  ["京都府", "馬場 喜滉", "馬場ちゃん", "ワインソムリエ目指してます！"],
-                  ["京都府", "荷掛 聖也", "にか", "最近入りました！"]
-                ].map((row, idx) => (
-                  <tr
-                    key={idx}
-                    className={`${idx % 2 === 1 ? 'bg-[rgba(255,255,240,0.5)]' : ''} hover:bg-[rgba(255,255,200,0.2)]`}
+              {loading ? (
+                <div className="p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto mb-4"></div>
+                  <p className="text-[#162b42]">読み込み中...</p>
+                </div>
+              ) : error ? (
+                <div className="p-8 text-center">
+                  <p className="text-red-600 mb-4">{error}</p>
+                  <button 
+                    onClick={() => window.location.reload()}
+                    className="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700"
                   >
-                    {row.map((text, i) => (
-                      <td
+                    再試行
+                  </button>
+                </div>
+              ) : activeCustomers.length === 0 ? (
+                <div className="p-8 text-center">
+                  <p className="text-[#162b42] text-lg">現在出席中のご贔屓さんはいません</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                                          <thead className="bg-[#162b42]/20">
+                        <tr>
+                          <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
+                            出身地
+                          </th>
+                          <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
+                            ニックネーム
+                          </th>
+                          <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
+                            コメント
+                          </th>
+                          <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
+                            来店回数
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {activeCustomers.map((customer) => (
+                          <tr
+                            key={customer.id}
+                            className="bg-white/60 hover:bg-white/80 transition-colors duration-200"
+                          >
+                            <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-medium">
+                              {customer.customer.home_town}
+                            </td>
+                            <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
+                              {customer.customer.nickname}
+                            </td>
+                            <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
+                              {customer.customer.comment || '-'}
+                            </td>
+                            <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-semibold">
+                              {customer.customer.visit_count}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+
+            {/* 本日のスタッフテーブル */}
+            <section className="bg-white/80 backdrop-blur-sm shadow-xl border border-[#162b42]/30 overflow-hidden">
+              <div className="bg-[#162b42] px-4 md:px-8 py-4">
+                <h2 className="text-lg md:text-xl font-bold text-amber-100 text-center tracking-wide">
+                  本日のスタッフ
+                </h2>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-[#162b42]/20">
+                    <tr>
+                      <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30 w-1/5">
+                        出身地
+                      </th>
+                      <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30 w-1/5">
+                        スタッフ名
+                      </th>
+                      <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30 w-2/5">
+                        ニックネーム
+                      </th>
+                      <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30 w-1/5">
+                        一言
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {staffData.map((staff, i) => (
+                      <tr
                         key={i}
-                        className={`px-2 py-1 border border-[#3f3520] bg-[rgba(255,255,240,0.65)] font-semibold text-[#1e1406] shadow-sm ${
-                          (i === 2 || i === 3) ? "text-left" : "text-center"
-                        }`}
+                        className="bg-white/80 hover:bg-white/80 transition-colors duration-200"
                       >
-                        {text}
-                      </td>
+                        <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-medium">
+                          {staff.prefecture}
+                        </td>
+                        <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-semibold">
+                          {staff.name}
+                        </td>
+                        <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
+                          {staff.nickname}
+                        </td>
+                        <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
+                          {staff.message}
+                        </td>
+                      </tr>
                     ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                  </tbody>
+                </table>
+              </div>
+            </section>
 
-        {/* お店からの一言 */}
-        <div className="flex-1 w-full sm:w-auto">
-          <h2 className="text-base mb-2 text-[#2d1d0f] border-l-4 border-[#8b5c2c] pl-2">
-            お店からの一言
-          </h2>
-          <div className="bg-[rgba(255,250,240,0.85)] border border-[#8b5c2c] p-4 rounded text-[0.95rem] leading-relaxed text-[#3a2a1c]">
-            🍶 大阪の地酒「〇〇」入荷しました！<br />
-            🐟 本日限定「エイヒレ炙り」あります！
-          </div>
-        </div>
-      </section>
+            {/* お店からの一言 */}
+            <section className="relative shadow-xl border border-[#162b42]/30 overflow-hidden">
+              <div className="absolute inset-0 bg-white/80 z-0 border border-[#162b42]/30" />
+              <div className="relative z-10">
+                <div className="bg-[#162b42] px-4 md:px-8 py-4">
+                  <h2 className="text-lg md:text-xl font-bold text-amber-100 text-center tracking-wide">
+                    お店からの一言
+                  </h2>
+                </div>
 
-      {/* フッター */}
-      <footer className="px-4 py-4 bg-[rgba(50,38,18,0.85)] border-t-4 border-[#2b220f] text-center text-sm sm:text-base font-mono text-[#d1c7a1] tracking-widest shadow-[inset_0_2px_5px_rgba(255,255,255,0.1)]">
-        <div className="flex flex-wrap justify-center gap-4">
-          <a href="https://linktr.ee/kotobuki_tachi" target="_blank" className="hover:underline hover:text-[#f0e9c7]">公式HP</a>
-          <a href="https://www.instagram.com/kotobuki_tachi/" target="_blank" className="hover:underline hover:text-[#f0e9c7]">Instagram</a>
-          <a href="https://x.com/kotobuki_tachi" target="_blank" className="hover:underline hover:text-[#f0e9c7]">X（旧Twitter）</a>
-          <a href="https://www.instagram.com/kotobuki_tachi/" target="_blank" className="hover:underline hover:text-[#f0e9c7]">Facebook（準備中）</a>
-        </div>
-      </footer>
+                <div className="p-4 md:p-8">
+                  <div className="space-y-4 md:space-y-6">
+                    <div className="flex items-start space-x-3 md:space-x-4">
+                      <span className="text-xl md:text-2xl">🍶</span>
+                      <div>
+                        <p className="text-base md:text-lg text-[#162b42] font-medium">
+                          大阪の地酒「〇〇」入荷しました！
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3 md:space-x-4">
+                      <span className="text-xl md:text-2xl">🐟</span>
+                      <div>
+                        <p className="text-base md:text-lg text-[#162b42] font-medium">
+                          本日限定「エイヒレ炙り」あります！
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </main>
+
+        {/* フッター */}
+        <Footer />
+      </div>
     </div>
   );
 }
