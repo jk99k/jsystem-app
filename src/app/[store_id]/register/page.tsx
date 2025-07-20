@@ -49,7 +49,10 @@ export default function Register() {
     e.preventDefault();
 
     const token = searchParams.get("token");
-    const payload: Omit<CustomerBase, 'question_answers'> & { question_answers?: string[], token?: string } = {
+    const payload: Omit<CustomerBase, "question_answers"> & {
+      question_answers?: string[];
+      token?: string;
+    } = {
       name: formData.name,
       furigana: formData.furigana,
       nickname: formData.nickname,
@@ -65,11 +68,16 @@ export default function Register() {
     try {
       const result = await registerCustomer(storeId, payload);
       const qrUrl = typeof result.qr_url === "string" ? result.qr_url : "";
-      const tempToken = typeof result.temp_token === "string" ? result.temp_token : "";
+      const tempToken =
+        typeof result.temp_token === "string" ? result.temp_token : "";
       if (tempToken) {
-        router.push(`/${storeId}/register/complete?temp_token=${encodeURIComponent(tempToken)}`);
+        router.push(
+          `/${storeId}/register/complete?temp_token=${encodeURIComponent(tempToken)}`
+        );
       } else {
-        router.push(`/${storeId}/register/complete${qrUrl ? `?qr_url=${encodeURIComponent(qrUrl)}` : ""}`);
+        router.push(
+          `/${storeId}/register/complete${qrUrl ? `?qr_url=${encodeURIComponent(qrUrl)}` : ""}`
+        );
       }
     } catch {
       alert("登録に失敗しました");
@@ -383,8 +391,7 @@ export default function Register() {
             </h2>
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                「百年蕎麦
-                壽」でどんな交流を期待しますか？（複数選択可）
+                「百年蕎麦 壽」でどんな交流を期待しますか？（複数選択可）
               </label>
               <div className="space-y-3 pl-2">
                 {expectationOptions.map(text => (

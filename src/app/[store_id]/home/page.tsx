@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { getActiveCustomers, CustomerAttendance, updateCustomerComment } from "@/services/api/customers";
+import {
+  getActiveCustomers,
+  CustomerAttendance,
+  updateCustomerComment,
+} from "@/services/api/customers";
 import CommentModal from "../../../components/CommentModal";
 
 const staffData = [
@@ -24,7 +28,9 @@ export default function Home() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const storeId = params.store_id as string;
-  const [activeCustomers, setActiveCustomers] = useState<CustomerAttendance[]>([]);
+  const [activeCustomers, setActiveCustomers] = useState<CustomerAttendance[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -38,8 +44,10 @@ export default function Home() {
         const customers = await getActiveCustomers(storeId);
         setActiveCustomers(customers);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '出席中顧客の取得に失敗しました');
-        console.error('出席中顧客の取得エラー:', err);
+        setError(
+          err instanceof Error ? err.message : "出席中顧客の取得に失敗しました"
+        );
+        console.error("出席中顧客の取得エラー:", err);
       } finally {
         setLoading(false);
       }
@@ -72,7 +80,7 @@ export default function Home() {
       <CommentModal
         open={showCommentModal}
         onClose={() => {
-          setShowCommentModal(false)
+          setShowCommentModal(false);
           router.replace(`/${storeId}/home`);
         }}
         onSubmit={handleCommentSubmit}
@@ -103,7 +111,7 @@ export default function Home() {
               ) : error ? (
                 <div className="p-8 text-center">
                   <p className="text-red-600 mb-4">{error}</p>
-                  <button 
+                  <button
                     onClick={() => window.location.reload()}
                     className="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700"
                   >
@@ -112,48 +120,50 @@ export default function Home() {
                 </div>
               ) : activeCustomers.length === 0 ? (
                 <div className="p-8 text-center">
-                  <p className="text-[#162b42] text-lg">現在出席中のご贔屓さんはいません</p>
+                  <p className="text-[#162b42] text-lg">
+                    現在出席中のご贔屓さんはいません
+                  </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                                          <thead className="bg-[#162b42]/20">
-                        <tr>
-                          <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
-                            出身地
-                          </th>
-                          <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
-                            ニックネーム
-                          </th>
-                          <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
-                            コメント
-                          </th>
-                          <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
-                            来店回数
-                          </th>
+                    <thead className="bg-[#162b42]/20">
+                      <tr>
+                        <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
+                          出身地
+                        </th>
+                        <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
+                          ニックネーム
+                        </th>
+                        <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
+                          コメント
+                        </th>
+                        <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30">
+                          来店回数
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeCustomers.map(customer => (
+                        <tr
+                          key={customer.id}
+                          className="bg-white/60 hover:bg-white/80 transition-colors duration-200"
+                        >
+                          <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-medium">
+                            {customer.customer.home_town}
+                          </td>
+                          <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
+                            {customer.customer.nickname}
+                          </td>
+                          <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
+                            {customer.customer.comment || "-"}
+                          </td>
+                          <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-semibold">
+                            {customer.customer.visit_count}
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {activeCustomers.map((customer) => (
-                          <tr
-                            key={customer.id}
-                            className="bg-white/60 hover:bg-white/80 transition-colors duration-200"
-                          >
-                            <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-medium">
-                              {customer.customer.home_town}
-                            </td>
-                            <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
-                              {customer.customer.nickname}
-                            </td>
-                            <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
-                              {customer.customer.comment || '-'}
-                            </td>
-                            <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-semibold">
-                              {customer.customer.visit_count}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
+                      ))}
+                    </tbody>
                   </table>
                 </div>
               )}
@@ -220,10 +230,7 @@ export default function Home() {
                   </h2>
                 </div>
 
-                <div className="p-4 md:p-8">
-                  本日プレオープン🍶
-
-                </div>
+                <div className="p-4 md:p-8">本日プレオープン🍶</div>
               </div>
             </section>
           </div>

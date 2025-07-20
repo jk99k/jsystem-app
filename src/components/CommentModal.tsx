@@ -7,7 +7,11 @@ interface CommentModalProps {
   onSubmit: (comment: string) => Promise<void>;
 }
 
-export default function CommentModal({ open, onClose, onSubmit }: CommentModalProps) {
+export default function CommentModal({
+  open,
+  onClose,
+  onSubmit,
+}: CommentModalProps) {
   const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,8 +42,12 @@ export default function CommentModal({ open, onClose, onSubmit }: CommentModalPr
         >
           ×
         </button>
-        <h2 className="text-xl font-bold text-amber-800 mb-4">今お店にいますか？</h2>
-        <p className="mb-4 text-[#162b42]">他のご贔屓さんにコメントを残しましょう！</p>
+        <h2 className="text-xl font-bold text-amber-800 mb-4">
+          今お店にいますか？
+        </h2>
+        <p className="mb-4 text-[#162b42]">
+          他のご贔屓さんにコメントを残しましょう！
+        </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <textarea
             className="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -72,4 +80,4 @@ export default function CommentModal({ open, onClose, onSubmit }: CommentModalPr
       </div>
     </div>
   );
-} 
+}

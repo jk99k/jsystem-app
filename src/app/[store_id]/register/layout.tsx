@@ -1,7 +1,11 @@
 import Footer from "@/components/Footer";
 import React from "react";
 
-export default function RegisterLayout({ children }: { children: React.ReactNode }) {
+export default function RegisterLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="min-h-screen bg-[url('/img/background.png')] bg-cover bg-center bg-fixed relative">
       {/* 背景オーバーレイ */}
@@ -12,4 +16,4 @@ export default function RegisterLayout({ children }: { children: React.ReactNode
       <Footer />
     </div>
   );
-} 
+}

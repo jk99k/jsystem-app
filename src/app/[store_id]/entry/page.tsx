@@ -1,7 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
-import { loginByToken, checkInCustomer, checkOutCustomer, getActiveCustomers } from "@/services/api/customers";
+import {
+  loginByToken,
+  checkInCustomer,
+  checkOutCustomer,
+  getActiveCustomers,
+} from "@/services/api/customers";
 
 const AUTH_ORIGIN =
   process.env.NODE_ENV === "production"
@@ -81,14 +86,16 @@ export default function EntryPage() {
   // 3. スタッフ操作画面が開かれた時に出席状況をチェック
   useEffect(() => {
     if (!showStaffOperations || !customer) return;
-    
+
     const checkActiveStatus = async () => {
       try {
         const activeCustomers = await getActiveCustomers(storeId);
-        const isActive = activeCustomers.some(attendance => attendance.customer_id === customer.id);
+        const isActive = activeCustomers.some(
+          attendance => attendance.customer_id === customer.id
+        );
         setIsCustomerActive(isActive);
       } catch (err) {
-        console.error('出席状況の取得に失敗しました:', err);
+        console.error("出席状況の取得に失敗しました:", err);
         setIsCustomerActive(false);
       }
     };
@@ -103,13 +110,13 @@ export default function EntryPage() {
     try {
       setActionLoading(true);
       setMessage(null);
-      
+
       await checkInCustomer(storeId, customer.id);
       setMessage("入店処理が完了しました");
       // 出席状況を更新
       setIsCustomerActive(true);
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'エラーが発生しました');
+      setMessage(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
       setActionLoading(false);
     }
@@ -122,13 +129,13 @@ export default function EntryPage() {
     try {
       setActionLoading(true);
       setMessage(null);
-      
+
       await checkOutCustomer(storeId, customer.id);
       setMessage("退店処理が完了しました");
       // 出席状況を更新
       setIsCustomerActive(false);
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'エラーが発生しました');
+      setMessage(err instanceof Error ? err.message : "エラーが発生しました");
     } finally {
       setActionLoading(false);
     }
@@ -140,7 +147,9 @@ export default function EntryPage() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-[url('/img/background.png')] bg-cover bg-center bg-fixed">
         <div className="bg-white/90 rounded-xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-700 mx-auto mb-4" />
-          <p className="text-lg font-semibold text-[#162b42]">お客様情報確認中…</p>
+          <p className="text-lg font-semibold text-[#162b42]">
+            お客様情報確認中…
+          </p>
         </div>
       </div>
     );
@@ -152,7 +161,9 @@ export default function EntryPage() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-[url('/img/background.png')] bg-cover bg-center bg-fixed">
         <div className="bg-white/90 rounded-xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-700 mx-auto mb-4" />
-          <p className="text-lg font-semibold text-[#162b42]">スタッフ認証確認中…</p>
+          <p className="text-lg font-semibold text-[#162b42]">
+            スタッフ認証確認中…
+          </p>
         </div>
       </div>
     );
@@ -164,7 +175,9 @@ export default function EntryPage() {
       return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-[url('/img/background.png')] bg-cover bg-center bg-fixed">
           <div className="bg-white/90 rounded-xl shadow-xl p-8 max-w-md w-full text-center">
-            <p className="text-2xl font-bold text-amber-800 mb-4">スタッフ認証済み</p>
+            <p className="text-2xl font-bold text-amber-800 mb-4">
+              スタッフ認証済み
+            </p>
             <p className="text-[#162b42] mb-6">顧客操作画面に移動しますか？</p>
             <button
               onClick={() => setShowStaffOperations(true)}
@@ -183,42 +196,68 @@ export default function EntryPage() {
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto">
             <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-2xl border border-white/20 p-6 mb-6">
-              <h1 className="text-3xl font-bold text-amber-800 mb-2">スタッフ操作画面</h1>
+              <h1 className="text-3xl font-bold text-amber-800 mb-2">
+                スタッフ操作画面
+              </h1>
               <p className="text-[#162b42]">店舗ID: {storeId}</p>
             </div>
 
             {customer && (
               <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-2xl border border-white/20 p-6 mb-6">
-                <h2 className="text-2xl font-bold text-amber-800 mb-4">顧客情報</h2>
+                <h2 className="text-2xl font-bold text-amber-800 mb-4">
+                  顧客情報
+                </h2>
                 <div className="space-y-2 text-[#162b42]">
-                  <p><strong>顧客ID:</strong> {customer.id}</p>
-                  <p><strong>店舗ID:</strong> {customer.store_id}</p>
-                  {customer.name && <p><strong>名前:</strong> {customer.name}</p>}
-                  {customer.email && <p><strong>メール:</strong> {customer.email}</p>}
-                  {customer.phone && <p><strong>電話番号:</strong> {customer.phone}</p>}
-                  <p><strong>出席状況:</strong> 
-                    <span className={`ml-2 px-2 py-1 rounded text-sm ${
-                      isCustomerActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {isCustomerActive ? '出席中' : '未出席'}
+                  <p>
+                    <strong>顧客ID:</strong> {customer.id}
+                  </p>
+                  <p>
+                    <strong>店舗ID:</strong> {customer.store_id}
+                  </p>
+                  {customer.name && (
+                    <p>
+                      <strong>名前:</strong> {customer.name}
+                    </p>
+                  )}
+                  {customer.email && (
+                    <p>
+                      <strong>メール:</strong> {customer.email}
+                    </p>
+                  )}
+                  {customer.phone && (
+                    <p>
+                      <strong>電話番号:</strong> {customer.phone}
+                    </p>
+                  )}
+                  <p>
+                    <strong>出席状況:</strong>
+                    <span
+                      className={`ml-2 px-2 py-1 rounded text-sm ${
+                        isCustomerActive
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {isCustomerActive ? "出席中" : "未出席"}
                     </span>
                   </p>
-
                 </div>
               </div>
             )}
 
             <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-2xl border border-white/20 p-6">
-              <h2 className="text-2xl font-bold text-amber-800 mb-6">顧客操作</h2>
-              
+              <h2 className="text-2xl font-bold text-amber-800 mb-6">
+                顧客操作
+              </h2>
+
               {message && (
-                <div className={`p-3 rounded-md mb-4 ${
-                  message.includes('完了') 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
+                <div
+                  className={`p-3 rounded-md mb-4 ${
+                    message.includes("完了")
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
                   {message}
                 </div>
               )}
@@ -255,8 +294,12 @@ export default function EntryPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-[url('/img/background.png')] bg-cover bg-center bg-fixed">
       <div className="bg-white/90 rounded-xl shadow-xl p-8 max-w-md w-full text-center">
         <p className="text-2xl font-bold text-amber-800 mb-2">ようこそ！</p>
-        <p className="text-[#162b42]">ご来店ありがとうございます。<br />入店記録が作成されました。</p>
+        <p className="text-[#162b42]">
+          ご来店ありがとうございます。
+          <br />
+          入店記録が作成されました。
+        </p>
       </div>
     </div>
   );
-} 
+}

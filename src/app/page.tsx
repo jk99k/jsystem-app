@@ -135,7 +135,7 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {attendanceData.map((person) => (
+                    {attendanceData.map(person => (
                       <tr
                         key={person.id}
                         className="bg-white/60 hover:bg-white/80 transition-colors duration-200"

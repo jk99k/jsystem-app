@@ -31,7 +31,10 @@ export default function Header({ formattedDate }: HeaderProps) {
       <div className="flex-1 flex items-center relative z-20">
         <div className="text-left w-full">
           <h1 className="text-2xl md:text-3xl font-bold text-amber-100 tracking-wide drop-shadow-lg leading-snug">
-            <span className="block md:inline">百年蕎麦 壽 <span dangerouslySetInnerHTML={{ __html: dateWithSerif }} /></span>
+            <span className="block md:inline">
+              百年蕎麦 壽{" "}
+              <span dangerouslySetInnerHTML={{ __html: dateWithSerif }} />
+            </span>
             <span className="block md:inline">ご贔屓さん出席状況</span>
           </h1>
         </div>

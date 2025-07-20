@@ -7,4 +7,4 @@ export default function QrCodeDisplay({ url }: { url: string }) {
       <QRCode value={url} size={200} />
     </div>
   );
-} 
+}
