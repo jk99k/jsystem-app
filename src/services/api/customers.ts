@@ -146,3 +146,15 @@ export async function checkOutCustomer(storeId: string, customerId: number): Pro
   
   return await res.json();
 } 
+
+export async function updateCustomerComment(customerId: number, comment: string): Promise<void> {
+  const res = await fetch(`${API_ORIGIN}/v1/customers/${customerId}/comment`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ comment })
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.detail || 'コメントの更新に失敗しました');
+  }
+} 

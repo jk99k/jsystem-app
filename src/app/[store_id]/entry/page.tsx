@@ -57,6 +57,7 @@ export default function EntryPage() {
   // 2. customerが存在した場合のみauth-check
   useEffect(() => {
     if (!customerChecked) return;
+    const token = searchParams.get("token");
     const iframe: HTMLIFrameElement = document.createElement("iframe");
     iframe.style.display = "none";
     iframe.src = `${AUTH_ORIGIN}/auth-check`;
@@ -67,7 +68,7 @@ export default function EntryPage() {
       if (event.data === "auth_ng") {
         setIsStaff(false);
         // 3. auth_ngならhome画面にリダイレクト
-        router.replace(`/${storeId}/home`);
+        router.replace(`/${storeId}/home?token=${token}`);
       }
     };
     window.addEventListener("message", handler);

@@ -1,29 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { getActiveCustomers, CustomerAttendance } from "@/services/api/customers";
+import { getActiveCustomers, CustomerAttendance, updateCustomerComment } from "@/services/api/customers";
+import CommentModal from "../../../components/CommentModal";
 
 const staffData = [
   {
     prefecture: "京都府",
     name: "乾　祐樹",
     nickname: "ぬい",
-    message: "店長です！",
-  },
-  {
-    prefecture: "京都府",
-    name: "荷掛　聖也",
-    nickname: "にか",
-    message: "最近入りました！",
-  },
-  {
-    prefecture: "京都府",
-    name: "馬場 喜滉",
-    nickname: "馬場ちゃん",
-    message: "ワインソムリエ目指してます！",
+    message: "お願いしますぅ〜^",
   },
 ];
 
@@ -32,10 +21,14 @@ const formattedDate = `${currentDate.getMonth() + 1}月${currentDate.getDate()}�
 
 export default function Home() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const storeId = params.store_id as string;
   const [activeCustomers, setActiveCustomers] = useState<CustomerAttendance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [commentTargetId, setCommentTargetId] = useState<number | null>(null);
 
   // 出席中の顧客一覧を取得
   useEffect(() => {
@@ -51,12 +44,39 @@ export default function Home() {
         setLoading(false);
       }
     };
-
     fetchActiveCustomers();
   }, [storeId]);
 
+  // tokenがクエリに存在する場合、該当顧客のモーダルを表示
+  useEffect(() => {
+    const token = searchParams.get("token");
+    if (!token) return;
+    // 出席中顧客一覧からtoken一致する顧客を探す
+    const target = activeCustomers.find(c => c.customer.token === token);
+    if (target) {
+      setCommentTargetId(target.customer.id);
+      setShowCommentModal(true);
+    }
+  }, [searchParams, activeCustomers]);
+
+  // コメント送信処理
+  const handleCommentSubmit = async (comment: string) => {
+    if (!commentTargetId) return;
+    await updateCustomerComment(commentTargetId, comment);
+    router.replace(`/${storeId}/home`);
+    setShowCommentModal(false);
+  };
+
   return (
     <div className="min-h-screen bg-[url('/img/background.png')] bg-cover bg-center bg-fixed relative font-serif">
+      <CommentModal
+        open={showCommentModal}
+        onClose={() => {
+          setShowCommentModal(false)
+          router.replace(`/${storeId}/home`);
+        }}
+        onSubmit={handleCommentSubmit}
+      />
       {/* 背景オーバーレイ */}
       <div className="fixed inset-0 bg-[rgba(40,30,15,0.15)] pointer-events-none -z-10" />
       {/* メインコンテナ */}
@@ -201,24 +221,8 @@ export default function Home() {
                 </div>
 
                 <div className="p-4 md:p-8">
-                  <div className="space-y-4 md:space-y-6">
-                    <div className="flex items-start space-x-3 md:space-x-4">
-                      <span className="text-xl md:text-2xl">🍶</span>
-                      <div>
-                        <p className="text-base md:text-lg text-[#162b42] font-medium">
-                          大阪の地酒「〇〇」入荷しました！
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-3 md:space-x-4">
-                      <span className="text-xl md:text-2xl">🐟</span>
-                      <div>
-                        <p className="text-base md:text-lg text-[#162b42] font-medium">
-                          本日限定「エイヒレ炙り」あります！
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  本日プレオープン🍶
+
                 </div>
               </div>
             </section>

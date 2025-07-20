@@ -65,7 +65,12 @@ export default function Register() {
     try {
       const result = await registerCustomer(storeId, payload);
       const qrUrl = typeof result.qr_url === "string" ? result.qr_url : "";
-      router.push(`/${storeId}/register/complete${qrUrl ? `?qr_url=${encodeURIComponent(qrUrl)}` : ""}`);
+      const tempToken = typeof result.temp_token === "string" ? result.temp_token : "";
+      if (tempToken) {
+        router.push(`/${storeId}/register/complete?temp_token=${encodeURIComponent(tempToken)}`);
+      } else {
+        router.push(`/${storeId}/register/complete${qrUrl ? `?qr_url=${encodeURIComponent(qrUrl)}` : ""}`);
+      }
     } catch {
       alert("登録に失敗しました");
     }
