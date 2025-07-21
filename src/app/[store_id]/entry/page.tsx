@@ -67,21 +67,31 @@ export default function EntryPage() {
     iframe.style.display = "none";
     iframe.src = `${AUTH_ORIGIN}/auth-check`;
     document.body.appendChild(iframe);
+    let timeoutId: NodeJS.Timeout | null = null;
     const handler = (event: MessageEvent) => {
       if (event.origin !== AUTH_ORIGIN) return;
-      if (event.data === "auth_ok") setIsStaff(true);
+      if (event.data === "auth_ok") {
+        setIsStaff(true);
+        if (timeoutId) clearTimeout(timeoutId);
+      }
       if (event.data === "auth_ng") {
         setIsStaff(false);
-        // 3. auth_ngならhome画面にリダイレクト
+        if (timeoutId) clearTimeout(timeoutId);
         router.replace(`/${storeId}/home?token=${token}`);
       }
     };
     window.addEventListener("message", handler);
+    // 3秒タイムアウト
+    timeoutId = setTimeout(() => {
+      setIsStaff(false);
+      router.replace(`/${storeId}/home?token=${token}`);
+    }, 3000);
     return () => {
       window.removeEventListener("message", handler);
       document.body.removeChild(iframe);
+      if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [customerChecked, router, storeId]);
+  }, [customerChecked, router, storeId, searchParams]);
 
   // 3. スタッフ操作画面が開かれた時に出席状況をチェック
   useEffect(() => {

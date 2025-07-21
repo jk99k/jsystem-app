@@ -1,7 +1,7 @@
 import QrCodeDisplay from "@/components/QrCodeDisplay";
 
 type Props = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default async function RegisterComplete({ searchParams }: Props) {
