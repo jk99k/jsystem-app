@@ -31,7 +31,6 @@ export default function EntryPage() {
   const params = useParams();
   const storeId = params?.store_id as string;
   const [isStaff, setIsStaff] = useState<boolean | null>(null);
-  const [customerChecked, setCustomerChecked] = useState(false);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [showStaffOperations, setShowStaffOperations] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -51,7 +50,6 @@ export default function EntryPage() {
           router.replace(`/${storeId}/register?token=${token}`);
         } else {
           setCustomer(customerData);
-          setCustomerChecked(true);
         }
       })
       .catch(() => {
@@ -61,7 +59,7 @@ export default function EntryPage() {
 
   // 2. customerが存在した場合のみauth-check
   useEffect(() => {
-    if (!customerChecked) return;
+    if (!customer) return;
     const token = searchParams.get("token");
     const iframe: HTMLIFrameElement = document.createElement("iframe");
     iframe.style.display = "none";
@@ -91,7 +89,7 @@ export default function EntryPage() {
       document.body.removeChild(iframe);
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [customerChecked, router, storeId, searchParams]);
+  }, [customer, router, storeId, searchParams]);
 
   // 3. スタッフ操作画面が開かれた時に出席状況をチェック
   useEffect(() => {
@@ -152,7 +150,7 @@ export default function EntryPage() {
   };
 
   // まだcustomerチェック中
-  if (!customerChecked) {
+  if (!customer) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[url('/img/background.png')] bg-cover bg-center bg-fixed">
         <div className="bg-white/90 rounded-xl shadow-xl p-8 max-w-md w-full text-center">
