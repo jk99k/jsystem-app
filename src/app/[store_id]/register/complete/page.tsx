@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import QrCodeDisplay from "@/components/QrCodeDisplay";
 
 type Props = {

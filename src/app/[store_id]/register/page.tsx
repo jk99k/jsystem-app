@@ -1,4 +1,7 @@
 "use client";
+
+export const runtime = 'edge';
+
 import React, { useState } from "react";
 import { registerCustomer } from "@/services/api/customers";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
