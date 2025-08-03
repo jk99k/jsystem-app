@@ -3,6 +3,25 @@ const API_ORIGIN =
     ? "https://jishikawasys.com/api"
     : "http://localhost:8001";
 
+// スタッフ出勤状況取得API用型
+export type ActiveStaff = {
+  nickname: string | null;
+  comment: string | null;
+};
+
+// 出勤中スタッフ一覧取得
+export async function getActiveStaff(storeId: string): Promise<ActiveStaff[]> {
+  const res = await fetch(`${API_ORIGIN}/v1/stores/${storeId}/active-staff`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.detail || "出勤中スタッフの取得に失敗しました");
+  }
+  return await res.json();
+}
+
 export type CustomerDisplay = {
   id: number;
   store_id: number;

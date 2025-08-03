@@ -1,6 +1,6 @@
 "use client";
 
-export const runtime = 'edge';
+export const runtime = "edge";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
@@ -10,22 +10,17 @@ import {
   getActiveCustomers,
   CustomerAttendance,
   updateCustomerComment,
+  getActiveStaff,
+  ActiveStaff,
 } from "@/services/api/customers";
 import CommentModal from "../../../components/CommentModal";
-
-const staffData = [
-  {
-    prefecture: "京都府",
-    name: "乾　祐樹",
-    nickname: "ぬい",
-    message: "お願いしますぅ〜^",
-  },
-];
 
 const currentDate = new Date();
 const formattedDate = `${currentDate.getMonth() + 1}月${currentDate.getDate()}日`;
 
 export default function Home() {
+  // スタッフ一覧の状態
+  const [activeStaff, setActiveStaff] = useState<ActiveStaff[]>([]);
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -37,6 +32,20 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [commentTargetId, setCommentTargetId] = useState<number | null>(null);
+
+  // 出勤中スタッフ一覧取得
+  useEffect(() => {
+    const fetchActiveStaff = async () => {
+      try {
+        const staff = await getActiveStaff(storeId);
+        setActiveStaff(staff);
+      } catch (err) {
+        // スタッフ取得エラーはエラー表示しない（顧客と独立）
+        console.error("出勤中スタッフの取得エラー:", err);
+      }
+    };
+    fetchActiveStaff();
+  }, [storeId]);
 
   // 出席中の顧客一覧を取得
   useEffect(() => {
@@ -178,45 +187,40 @@ export default function Home() {
                   本日のスタッフ
                 </h2>
               </div>
-
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-[#162b42]/20">
                     <tr>
-                      <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30 w-1/5">
-                        出身地
-                      </th>
-                      <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30 w-1/5">
-                        スタッフ名
-                      </th>
-                      <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30 w-2/5">
+                      <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30 w-1/2">
                         ニックネーム
                       </th>
-                      <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30 w-1/5">
+                      <th className="px-2 md:px-8 py-3 md:py-4 text-left text-sm md:text-base font-semibold text-[#162b42] border-b border-[#162b42]/30 w-1/2">
                         一言
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {staffData.map((staff, i) => (
-                      <tr
-                        key={i}
-                        className="bg-white/80 hover:bg-white/80 transition-colors duration-200"
-                      >
-                        <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-medium">
-                          {staff.prefecture}
-                        </td>
-                        <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-semibold">
-                          {staff.name}
-                        </td>
-                        <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
-                          {staff.nickname}
-                        </td>
-                        <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
-                          {staff.message}
+                    {activeStaff.length === 0 ? (
+                      <tr>
+                        <td colSpan={2} className="text-center py-4">
+                          出勤中のスタッフはいません
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      activeStaff.map((staff, i) => (
+                        <tr
+                          key={i}
+                          className="bg-white/80 hover:bg-white/80 transition-colors duration-200"
+                        >
+                          <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20 font-semibold">
+                            {staff.nickname || "名無し"}
+                          </td>
+                          <td className="px-2 md:px-8 py-3 md:py-4 text-sm md:text-base text-[#162b42] border-b border-[#162b42]/20">
+                            {staff.comment || ""}
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
