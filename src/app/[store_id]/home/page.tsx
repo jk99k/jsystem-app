@@ -12,6 +12,8 @@ import {
   updateCustomerComment,
   getActiveStaff,
   ActiveStaff,
+  getStoreDetail,
+  StoreDetail,
 } from "@/services/api/customers";
 import CommentModal from "../../../components/CommentModal";
 
@@ -19,12 +21,26 @@ const currentDate = new Date();
 const formattedDate = `${currentDate.getMonth() + 1}月${currentDate.getDate()}日`;
 
 export default function Home() {
-  // スタッフ一覧の状態
   const [activeStaff, setActiveStaff] = useState<ActiveStaff[]>([]);
+  const [storeDetail, setStoreDetail] = useState<StoreDetail | null>(null);
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
   const storeId = params.store_id as string;
+
+  // 店舗情報取得
+  useEffect(() => {
+    if (!storeId) return;
+    const fetchStoreDetail = async () => {
+      try {
+        const detail = await getStoreDetail(storeId);
+        setStoreDetail(detail);
+      } catch (err) {
+        console.error("店舗情報の取得エラー:", err);
+      }
+    };
+    fetchStoreDetail();
+  }, [storeId]);
   const [activeCustomers, setActiveCustomers] = useState<CustomerAttendance[]>(
     []
   );
@@ -236,7 +252,7 @@ export default function Home() {
                   </h2>
                 </div>
 
-                <div className="p-4 md:p-8">本日プレオープン🍶</div>
+                <div className="p-4 md:p-8">{storeDetail?.comment}</div>
               </div>
             </section>
           </div>

@@ -1,3 +1,20 @@
+// 店舗詳細型
+export type StoreDetail = {
+  id: number;
+  name: string;
+  comment?: string | null;
+  // 必要に応じて他のフィールドを追加
+};
+
+// 店舗詳細取得
+export async function getStoreDetail(storeId: string): Promise<StoreDetail> {
+  const res = await fetch(`${API_ORIGIN}/v1/stores/${storeId}`);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.detail || "店舗情報の取得に失敗しました");
+  }
+  return await res.json();
+}
 const API_ORIGIN =
   process.env.NODE_ENV === "production"
     ? "https://jishikawasys.com/api"
