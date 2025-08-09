@@ -13,7 +13,7 @@ import {
 
 const AUTH_ORIGIN =
   process.env.NODE_ENV === "production"
-    ? "https://jishikawasys.com"
+    ? "https://staff.jishikawasys.com"
     : "http://localhost:3005";
 
 interface Customer {
