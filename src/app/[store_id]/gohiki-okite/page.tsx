@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = "edge";
+
 import { useRouter } from "next/navigation";
 
 export default function GohikiOkite() {
