@@ -19,24 +19,24 @@ export default function Header({ formattedDate }: HeaderProps) {
   );
 
   return (
-    <header className="border-b-2 border-[#162b42] shadow-lg flex h-20 bg-[#162b42] relative overflow-hidden">
+    <header className="border-b-2 border-[#162b42] shadow-lg bg-[#162b42] relative overflow-hidden flex items-center h-auto min-h-20 px-2 md:px-4 py-0">
       {/* 背景画像 */}
       <div className="absolute inset-0 bg-[url('/img/background.png')] bg-cover bg-center opacity-20"></div>
       {/* 下5%の黒いグラデーション */}
       <div className="absolute bottom-0 left-0 right-0 h-[15%] bg-gradient-to-t from-black/60 to-transparent z-10"></div>
 
-      <div className="h-20 w-20 flex items-center justify-center relative z-20">
+      <div className="h-14 w-14 md:h-20 md:w-20 flex items-center justify-center relative z-20 flex-shrink-0 ml-1 md:ml-4">
         <Image
           src="/img/kotobuki_logo.jpg"
           alt="百年蕎麦 壽 ロゴ"
-          width={72}
-          height={72}
+          width={56}
+          height={56}
           className="rounded-full object-cover border-2 drop-shadow-xl"
         />
       </div>
-      <div className="flex-1 flex items-center relative z-20">
-        <div className="text-left w-full">
-          <h1 className="text-2xl md:text-3xl font-bold text-amber-100 tracking-wide drop-shadow-lg leading-snug">
+      <div className="flex-1 flex flex-row items-center justify-between relative z-20 min-w-0 gap-2 md:gap-4">
+        <div className="text-left flex-1 min-w-0">
+          <h1 className="text-base md:text-3xl font-bold text-amber-100 tracking-wide drop-shadow-lg leading-snug truncate">
             <span className="block md:inline">
               百年蕎麦 壽{" "}
               <span dangerouslySetInnerHTML={{ __html: dateWithSerif }} />
@@ -44,14 +44,15 @@ export default function Header({ formattedDate }: HeaderProps) {
             <span className="block md:inline">ご贔屓さん出席状況</span>
           </h1>
         </div>
-      <div className="flex items-center px-2">
-        <button
-          className="font-semibold cursor-pointer rounded px-3 py-4 text-xs md:text-sm text-white shadow transition whitespace-nowrap"
-          onClick={() => router.push(`/${storeId}/gohiki-okite`)}
-        >
-          ご贔屓さんの掟
-        </button>
-      </div>
+        <div className="flex items-center flex-shrink-0">
+          <button
+            className="font-semibold cursor-pointer rounded px-3 py-2 text-xs md:text-sm shadow transition whitespace-nowrap text-white"
+            onClick={() => router.push(`/${storeId}/gohiki-okite`)}
+            style={{maxWidth:'180px'}}
+          >
+            ご贔屓さんの掟
+          </button>
+        </div>
       </div>
     </header>
   );
