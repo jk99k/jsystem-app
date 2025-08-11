@@ -118,6 +118,9 @@ export default function Home() {
       <div className="relative z-10 min-h-screen flex flex-col">
         {/* ヘッダー */}
         <Header formattedDate={formattedDate} />
+        <div className="w-full bg-yellow-200 text-yellow-900 text-center py-2 text-sm font-bold border-b border-yellow-400">
+          このページはまだβ版です
+        </div>
 
         {/* メインコンテンツ */}
         <main className="flex-1 flex items-center justify-center p-4">

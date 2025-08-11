@@ -1,10 +1,16 @@
+"use client";
 import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
 
 interface HeaderProps {
   formattedDate: string;
 }
 
 export default function Header({ formattedDate }: HeaderProps) {
+  const router = useRouter();
+  const params = useParams();
+  const storeId = params.store_id as string;
+
   // 日付の数字部分だけspanで囲む
   const dateWithSerif = formattedDate.replace(
     /([0-9０-９]+)/g,
@@ -38,6 +44,14 @@ export default function Header({ formattedDate }: HeaderProps) {
             <span className="block md:inline">ご贔屓さん出席状況</span>
           </h1>
         </div>
+      <div className="flex items-center px-2">
+        <button
+          className="font-semibold cursor-pointer rounded px-3 py-4 text-xs md:text-sm text-white shadow transition whitespace-nowrap"
+          onClick={() => router.push(`/${storeId}/gohiki-okite`)}
+        >
+          ご贔屓さんの掟
+        </button>
+      </div>
       </div>
     </header>
   );
