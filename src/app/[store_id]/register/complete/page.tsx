@@ -34,7 +34,7 @@ export default async function RegisterComplete({
       <h1 className="text-2xl font-bold text-amber-800 mb-2">
         ご登録ありがとうございました！
       </h1>
-      {tempToken || qrUrl ? (
+      {(tempToken || qrUrl) ? (
         <>
           <p className="text-lg text-[#162b42]">
             このQRコードをスクリーンショットして、
