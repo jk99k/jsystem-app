@@ -231,3 +231,49 @@ export async function updateCustomerComment(
     throw new Error(errorData.detail || "コメントの更新に失敗しました");
   }
 }
+
+// トークンで顧客情報取得
+export async function getCustomerByToken(
+  token: string
+): Promise<CustomerDetail> {
+  const res = await fetch(`${API_ORIGIN}/v1/customers/by-token/${token}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.detail || "顧客情報の取得に失敗しました");
+  }
+  return await res.json();
+}
+
+// トークンで顧客情報更新
+export async function updateCustomerByToken(
+  token: string,
+  data: Partial<CustomerDetail & { question_answers_array?: string[] }>
+): Promise<void> {
+  const updateData = {
+    name: data.name,
+    furigana: data.furigana,
+    nickname: data.nickname,
+    mail_address: data.mail_address,
+    gender: data.gender,
+    home_town: data.home_town,
+    post_code: data.post_code,
+    address: data.address,
+    birth_date: data.birth_date,
+    question_answers: data.question_answers_array
+      ? data.question_answers_array.join(",")
+      : data.question_answers,
+  };
+
+  const res = await fetch(`${API_ORIGIN}/v1/customers/${token}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updateData),
+  });
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.detail || "顧客情報の更新に失敗しました");
+  }
+}

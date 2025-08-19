@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 interface HeaderProps {
   formattedDate: string;
@@ -9,7 +9,9 @@ interface HeaderProps {
 export default function Header({ formattedDate }: HeaderProps) {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const storeId = params.store_id as string;
+  const token = searchParams.get("token");
 
   // 日付の数字部分だけspanで囲む
   const dateWithSerif = formattedDate.replace(
@@ -44,14 +46,27 @@ export default function Header({ formattedDate }: HeaderProps) {
             <span className="block md:inline">ご贔屓さん出席状況</span>
           </h1>
         </div>
-        <div className="flex items-center flex-shrink-0">
+        <div className="flex items-center flex-shrink-0 gap-2">
           <button
             className="font-semibold cursor-pointer rounded px-3 py-2 text-xs md:text-sm shadow transition whitespace-nowrap text-white"
             onClick={() => router.push(`/${storeId}/gohiki-okite`)}
-            style={{maxWidth:'180px'}}
+            style={{ maxWidth: "180px" }}
           >
             ご贔屓さんの掟
           </button>
+          {token && (
+            <button
+              className="font-semibold cursor-pointer rounded px-3 py-2 text-xs md:text-sm shadow transition whitespace-nowrap text-white bg-amber-600 hover:bg-amber-700"
+              onClick={() =>
+                router.push(
+                  `/${storeId}/mypage?token=${encodeURIComponent(token)}`
+                )
+              }
+              style={{ maxWidth: "120px" }}
+            >
+              マイページ
+            </button>
+          )}
         </div>
       </div>
     </header>

@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { registerCustomer } from "@/services/api/customers";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import type { CustomerBase } from "@/services/api/customers";
+import { QUESTION_OPTIONS } from "@/constants/questionOptions";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -135,14 +136,6 @@ export default function Register() {
     "宮崎県",
     "鹿児島県",
     "沖縄県",
-  ];
-
-  const expectationOptions = [
-    "静かに一人で蕎麦と酒を楽しみたい",
-    "同じ趣味・話題を持つ人と話したい",
-    "新しい飲み友を見つけたい",
-    "スタッフと色々な話がしたい",
-    "特に何も期待しない／流れに任せる",
   ];
 
   const currentYear = new Date().getFullYear();
@@ -397,7 +390,7 @@ export default function Register() {
                 「百年蕎麦 壽」でどんな交流を期待しますか？（複数選択可）
               </label>
               <div className="space-y-3 pl-2">
-                {expectationOptions.map(text => (
+                {QUESTION_OPTIONS.map(text => (
                   <label
                     key={text}
                     className="flex items-center space-x-3 cursor-pointer"
